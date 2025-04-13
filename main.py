@@ -42,7 +42,7 @@ async def create_bucket(
     context: Context,
     bucket_name: str,
     region: str = "us-west-1",
-    config: Optional[Dict[str, Any]] = None
+    config: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Union[bool, str]]:
     """
     Create a new S3 bucket.
@@ -101,7 +101,9 @@ async def create_bucket(
 
 
 @app.tool(name="list_bucket", description="List objects in a bucket")
-async def list_bucket(context: Context, bucket_name: str, key_prefix: str = "") -> Dict[str, Union[str, List[Dict[str, Union[str, int]]]]:
+async def list_bucket(
+    context: Context, bucket_name: str, key_prefix: str = ""
+) -> Dict[str, Union[str, List[Dict[str, Union[str, int]]]]:
     """
     List objects in a specified S3 bucket.
 
@@ -133,13 +135,16 @@ async def list_bucket(context: Context, bucket_name: str, key_prefix: str = "") 
                         "last_modified": obj["LastModified"].isoformat(),
                     }
                 )
-        return {"bucket": bucket_name, "files": files}
+        return {"bucket": bucket_name, "files": files}  
     except Exception as e:
         return {"error": str(e)}
 
 
+
 @app.tool(name="get_object", description="Get an object from a bucket")
-async def get_object(context: Context, bucket_name: str, key: str) -> Union[str, Dict[str, str]]:
+async def get_object(
+    context: Context, bucket_name: str, key: str
+) -> Union[str, Dict[str, str]]:
     """
     Retrieve an object from a specified S3 bucket.
 
@@ -161,7 +166,9 @@ async def get_object(context: Context, bucket_name: str, key: str) -> Union[str,
 
 
 @app.tool(name="put_object", description="Put an object into a bucket")
-async def put_object(context: Context, bucket_name: str, key: str, body: str) -> Dict[str, bool]:
+async def put_object(
+    context: Context, bucket_name: str, key: str, body: str
+) -> Dict[str, bool]:
     """
     Upload an object to a specified S3 bucket.
 
@@ -243,7 +250,9 @@ async def download_file_to_local(
 
 
 @app.tool(name="delete_object", description="Delete an object from a bucket")
-async def delete_object(context: Context, bucket_name: str, key: str) -> Dict[str, bool]:
+async def delete_object(
+    context: Context, bucket_name: str, key: str
+) -> Dict[str, bool]:
     """
     Delete an object from a specified S3 bucket.
 
@@ -307,7 +316,9 @@ async def generate_presigned_url(
 
 
 @app.tool(name="put_bucket_policy", description="Set or update a bucket policy")
-async def put_bucket_policy(context: Context, bucket_name: str, policy_json: str) -> Dict[str, bool]:
+async def put_bucket_policy(
+    context: Context, bucket_name: str, policy_json: str
+) -> Dict[str, bool]:
     """
     Set or update the policy for a specified S3 bucket.
 
@@ -331,7 +342,9 @@ async def put_bucket_policy(context: Context, bucket_name: str, policy_json: str
 
 
 @app.tool(name="get_bucket_policy", description="Retrieve the current bucket policy")
-async def get_bucket_policy(context: Context, bucket_name: str) -> Dict[str, Union[bool, str]]:
+async def get_bucket_policy(
+    context: Context, bucket_name: str
+) -> Dict[str, Union[bool, str]]:
     """
     Retrieve the current policy for a specified S3 bucket.
 

@@ -107,8 +107,11 @@ export AWS_REGION=your_region
 - **Lifecycle Configuration**: Manage lifecycle rules for S3 buckets.
 - **Object Tagging**: Set and retrieve tags for S3 objects.
 - **CORS Configuration**: Get and set CORS rules for a bucket.
+- **Copy Object**: Copy an object from one location to another within S3.
+- **Download File to Local**: Download a file from a specified S3 bucket to a local path.
+- **Upload Local File**: Upload a local file to a specified S3 bucket.
 
-## Usage Examples
+## Few Usage Examples
 
 ### List Buckets
 
@@ -160,4 +163,4 @@ print(response)
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+[MIT](/LICENSE)

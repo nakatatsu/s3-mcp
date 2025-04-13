@@ -32,21 +32,21 @@ Add this to your Cursor MCP configuration:
         "-e",
         "AWS_SECRET_ACCESS_KEY=your_access_key",
         "-e",
-        "AWS_ACCESS_KEY_ID=hvs.your_access_key-vault-token",
+        "AWS_ACCESS_KEY_ID=your_access_key",
         "-e",
         "AWS_REGION=your_region",
-        "ashgw/vault-mcp:latest"
+        "ashgw/s3-mcp:latest"
       ]
     }
   }
 }
 ```
 
-> If you prefer pinning to a specific docker image build (e.g. 20250413-165732), use that tag instead of latest. Browse available versions on [Docker Hub](https://hub.docker.com/r/ashgw/s3-mcp/tags).
+> If you prefer pinning to a specific Docker image build (e.g., 20250413-165732), use that tag instead of `latest`. Browse available versions on [Docker Hub](https://hub.docker.com/r/ashgw/s3-mcp/tags).
 
 Once added, you can use prompts like:
 
-> "Read the secret at path `apps/myapp/config` from Vault"
+> "Read the secret at path `apps/myapp/config` from Vault."
 
 Cursor will route that request through the MCP server automatically.
 
@@ -54,7 +54,7 @@ Cursor will route that request through the MCP server automatically.
 
 ### Docker (manual)
 
-You can run Vault MCP manually via Docker:
+You can run the S3 MCP server manually via Docker:
 
 ```bash
 docker run --rm -it \
@@ -70,16 +70,16 @@ This uses the pre-built image published at [ashgw/s3-mcp](https://hub.docker.com
 
 ### Repo
 
-Clone the repository and `cd` into it, then build with
+Clone the repository and `cd` into it, then build with:
 
-```
-docker build -t vault-mcp .
+```bash
+docker build -t s3-mcp .
 ```
 
-Then run with
+Then run with:
 
-```
-docker run --rm -e VAULT_ADDR=localhost:8200 -e VAULT_TOKEN=hsv.yourtoken vault-mcp
+```bash
+docker run --rm -e AWS_ACCESS_KEY_ID=your_access_key -e AWS_SECRET_ACCESS_KEY=your_secret_key -e AWS_REGION=your_region s3-mcp
 ```
 
 ### Environment Variables
@@ -161,12 +161,3 @@ print(response)
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-## Contributing
-
-Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
-
-## Acknowledgments
-
-- [Boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html) for AWS SDK for Python.
-- [FastMCP](https://github.com/yourusername/fastmcp) for the Model Context Protocol framework.

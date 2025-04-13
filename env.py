@@ -1,10 +1,11 @@
-from environs import Env 
+from environs import Env
 
 
 class EnvConfig:
     def __init__(self):
         self.env = Env()
         self.env.read_env()
+
     @property
     def AWS_ACCESS_KEY_ID(self):
         return self.env("AWS_ACCESS_KEY_ID")
@@ -17,6 +18,7 @@ class EnvConfig:
     def AWS_REGION(self):
         return self.env("AWS_REGION", "us-west-1")
 
+
 env = EnvConfig()
 
-__all__ = ['env']
+__all__ = ["env"]

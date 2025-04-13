@@ -77,5 +77,6 @@ def main() -> None:
     exit_code = commands[args.command]()
     sys.exit(exit_code if isinstance(exit_code, int) else 0)
 
+
 if __name__ == "__main__":
     main()

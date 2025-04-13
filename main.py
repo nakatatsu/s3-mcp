@@ -168,7 +168,7 @@ async def get_object(
 @app.tool(name="put_object", description="Put an object into a bucket")
 async def put_object(
     context: Context, bucket_name: str, key: str, body: str
-) -> Dict[str, bool]:
+) -> Dict[str, Union[bool, str]]:
     """
     Upload an object to a specified S3 bucket.
 
@@ -195,7 +195,7 @@ async def put_object(
 @app.tool(name="upload_local_file", description="Upload a local file to a bucket")
 async def upload_local_file(
     context: Context, bucket_name: str, local_path: str, key: str
-) -> Dict[str, bool]:
+) -> Dict[str, Union[bool, str]]:
     """
     Upload a local file to a specified S3 bucket.
 
@@ -225,7 +225,7 @@ async def upload_local_file(
 )
 async def download_file_to_local(
     context: Context, bucket_name: str, key: str, local_path: str
-) -> Dict[str, bool]:
+) -> Dict[str, Union[bool, str]]:
     """
     Download a file from a specified S3 bucket to a local path.
 
@@ -252,7 +252,7 @@ async def download_file_to_local(
 @app.tool(name="delete_object", description="Delete an object from a bucket")
 async def delete_object(
     context: Context, bucket_name: str, key: str
-) -> Dict[str, bool]:
+) -> Dict[str, Union[bool, str]]:
     """
     Delete an object from a specified S3 bucket.
 
@@ -318,7 +318,7 @@ async def generate_presigned_url(
 @app.tool(name="put_bucket_policy", description="Set or update a bucket policy")
 async def put_bucket_policy(
     context: Context, bucket_name: str, policy_json: str
-) -> Dict[str, bool]:
+) -> Dict[str, Union[bool, str]]:
     """
     Set or update the policy for a specified S3 bucket.
 
@@ -368,7 +368,7 @@ async def get_bucket_policy(
 
 
 @app.tool(name="delete_bucket_policy", description="Delete the current bucket policy")
-async def delete_bucket_policy(context: Context, bucket_name: str) -> Dict[str, bool]:
+async def delete_bucket_policy(context: Context, bucket_name: str) -> Dict[str, Union[bool, str]]:
     """
     Delete the current policy for a specified S3 bucket.
 

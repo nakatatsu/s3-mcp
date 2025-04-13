@@ -1,7 +1,7 @@
 FROM python:3.12-slim AS base
 
 RUN apt-get update && apt-get install -y curl && \
-    curl -LO https://github.com/astral-sh/uv/releases/download/0.1.23/uv-x86_64-unknown-linux-gnu.tar.gz && \
+    curl -LO https://github.com/astral-sh/uv/releases/download/0.4.18/uv-x86_64-unknown-linux-gnu.tar.gz && \
     tar xzf uv-x86_64-unknown-linux-gnu.tar.gz && \
     mv uv-x86_64-unknown-linux-gnu/uv /usr/local/bin/ && \
     chmod +x /usr/local/bin/uv && \
@@ -10,8 +10,11 @@ RUN apt-get update && apt-get install -y curl && \
 
 WORKDIR /app
 COPY pyproject.toml uv.lock ./
-RUN uv sync
+RUN uv sync --frozen --no-cache-dir
 
 COPY . .
 
 CMD ["python", "-m", "main"]
+
+
+

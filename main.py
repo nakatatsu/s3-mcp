@@ -391,5 +391,243 @@ async def delete_bucket_policy(
         return {"error": str(e)}
 
 
+@app.tool(name="delete_bucket", description="Delete an empty S3 bucket")
+async def delete_bucket(
+    context: Context, bucket_name: str
+) -> Dict[str, Union[bool, str]]:
+    """
+    Delete an empty S3 bucket.
+
+    Args:
+        bucket_name (str): The name of the bucket to delete.
+
+    Returns:
+        A dictionary indicating success or error.
+
+    Example:
+        {
+            "success": True
+        }
+    """
+    try:
+        s3_client.delete_bucket(Bucket=bucket_name)
+        return {"success": True}
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@app.tool(name="copy_object", description="Copy an object from one location to another")
+async def copy_object(
+    context: Context,
+    source_bucket: str,
+    source_key: str,
+    dest_bucket: str,
+    dest_key: str,
+) -> Dict[str, Union[bool, str]]:
+    """
+    Copy an object from one location to another within S3.
+
+    Args:
+        source_bucket (str): Source bucket name
+        source_key (str): Source object key
+        dest_bucket (str): Destination bucket name
+        dest_key (str): Destination object key
+
+    Returns:
+        A dictionary indicating success or error.
+
+    Example:
+        {
+            "success": True,
+            "copy_id": "copy-operation-id"
+        }
+    """
+    try:
+        response = s3_client.copy_object(
+            CopySource={"Bucket": source_bucket, "Key": source_key},
+            Bucket=dest_bucket,
+            Key=dest_key,
+        )
+        return {"success": True, "copy_id": response["CopyObjectResult"]["ETag"]}
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@app.tool(name="get_bucket_lifecycle", description="Get bucket lifecycle configuration")
+async def get_bucket_lifecycle(
+    context: Context, bucket_name: str
+) -> Dict[str, Union[List[Dict[str, Any]], str]]:
+    """
+    Get the lifecycle configuration of a bucket.
+
+    Args:
+        bucket_name (str): The name of the bucket
+
+    Returns:
+        A dictionary containing lifecycle rules or error message.
+
+    Example:
+        {
+            "rules": [
+                {
+                    "ID": "Move to IA after 30 days",
+                    "Status": "Enabled",
+                    "Transitions": [{"Days": 30, "StorageClass": "STANDARD_IA"}]
+                }
+            ]
+        }
+    """
+    try:
+        response = s3_client.get_bucket_lifecycle_configuration(Bucket=bucket_name)
+        # Convert LifecycleRuleOutputTypeDef to Dict[str, Any]
+        rules = [{k: v for k, v in rule.items()} for rule in response["Rules"]]
+        return {"rules": rules}
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@app.tool(name="put_bucket_lifecycle", description="Set bucket lifecycle configuration")
+async def put_bucket_lifecycle(
+    context: Context, bucket_name: str, lifecycle_config: List[Dict[str, Any]]
+) -> Dict[str, Union[bool, str]]:
+    """
+    Set lifecycle configuration for a bucket.
+
+    Args:
+        bucket_name (str): The name of the bucket
+        lifecycle_config (List[Dict[str, Any]]): Lifecycle configuration rules
+
+    Returns:
+        A dictionary indicating success or error.
+
+    Example:
+        {
+            "success": True
+        }
+    """
+    try:
+        formatted_rules = []
+        for rule in lifecycle_config:
+            formatted_rule = {
+                "ID": rule.get("ID"),
+                "Status": rule.get("Status"),
+                "Transitions": rule.get("Transitions", []),
+                "Expiration": rule.get("Expiration"),
+                "NoncurrentVersionExpiration": rule.get("NoncurrentVersionExpiration"),
+                "NoncurrentVersionTransitions": rule.get(
+                    "NoncurrentVersionTransitions", []
+                ),
+            }
+            formatted_rules.append(formatted_rule)
+
+        s3_client.put_bucket_lifecycle_configuration(
+            Bucket=bucket_name,
+            LifecycleConfiguration={
+                "Rules": formatted_rules  # type: ignore
+            },
+        )
+        return {"success": True}
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@app.tool(name="get_object_tagging", description="Get object tags")
+async def get_object_tagging(
+    context: Context, bucket_name: str, key: str
+) -> Dict[str, Union[List[Dict[str, str]], str]]:
+    """
+    Get tags for an S3 object.
+
+    Args:
+        bucket_name (str): The name of the bucket
+        key (str): The object key
+
+    Returns:
+        A dictionary containing object tags or error message.
+
+    Example:
+        {
+            "tags": [
+                {"Key": "project", "Value": "demo"},
+                {"Key": "environment", "Value": "production"}
+            ]
+        }
+    """
+    try:
+        response = s3_client.get_object_tagging(Bucket=bucket_name, Key=key)
+        tags = [
+            {"Key": tag["Key"], "Value": tag["Value"]} for tag in response["TagSet"]
+        ]
+        return {"tags": tags}
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@app.tool(name="put_object_tagging", description="Set object tags")
+async def put_object_tagging(
+    context: Context, bucket_name: str, key: str, tags: List[Dict[str, str]]
+) -> Dict[str, Union[bool, str]]:
+    """
+    Set tags for an S3 object.
+
+    Args:
+        bucket_name (str): The name of the bucket
+        key (str): The object key
+        tags (List[Dict[str, str]]): List of tag dictionaries with Key and Value
+
+    Returns:
+        A dictionary indicating success or error.
+
+    Example:
+        {
+            "success": True
+        }
+    """
+    try:
+        formatted_tags = [{"Key": tag["Key"], "Value": tag["Value"]} for tag in tags]
+
+        s3_client.put_object_tagging(
+            Bucket=bucket_name,
+            Key=key,
+            Tagging={"TagSet": formatted_tags},  # type: ignore
+        )
+        return {"success": True}
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@app.tool(name="get_bucket_cors", description="Get bucket CORS configuration")
+async def get_bucket_cors(
+    context: Context, bucket_name: str
+) -> Dict[str, Union[List[Dict[str, Any]], str]]:
+    """
+    Get CORS configuration for a bucket.
+
+    Args:
+        bucket_name (str): The name of the bucket
+
+    Returns:
+        A dictionary containing CORS rules or error message.
+
+    Example:
+        {
+            "cors_rules": [
+                {
+                    "AllowedHeaders": ["*"],
+                    "AllowedMethods": ["GET", "PUT"],
+                    "AllowedOrigins": ["https://example.com"],
+                    "MaxAgeSeconds": 3000
+                }
+            ]
+        }
+    """
+    try:
+        response = s3_client.get_bucket_cors(Bucket=bucket_name)
+        cors_rules = [{k: v for k, v in rule.items()} for rule in response["CORSRules"]]
+        return {"cors_rules": cors_rules}
+    except Exception as e:
+        return {"error": str(e)}
+
+
 if __name__ == "__main__":
     app.run(transport="stdio")

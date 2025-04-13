@@ -1,0 +1,66 @@
+name: Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+
+permissions:
+  contents: write
+
+env:
+  DOCKERHUB_USERNAME: ashgw
+
+jobs:
+  fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+      - name: Run formatter
+        run: uv format --check
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+      - name: Run linter
+        run: uv lint
+
+  docker-push:
+    if: github.event_name == 'push'
+    needs: [fmt, lint]
+    environment: push container
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set DATE_TAG
+        run: echo "DATE_TAG=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
+
+      - name: Build & tag image
+        run: |
+          docker build -t ${{ env.DOCKERHUB_USERNAME }}/s3-mcp:${{ env.DATE_TAG }} .
+          docker tag ${{ env.DOCKERHUB_USERNAME }}/s3-mcp:${{ env.DATE_TAG }} ${{ env.DOCKERHUB_USERNAME }}/s3-mcp:latest
+
+      - name: Login to DockerHub
+        run: echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ env.DOCKERHUB_USERNAME }} --password-stdin
+
+      - name: Push date-tagged image
+        run: docker push ${{ env.DOCKERHUB_USERNAME }}/s3-mcp:${{ env.DATE_TAG }}
+
+      - name: Push latest tag
+        run: docker push ${{ env.DOCKERHUB_USERNAME }}/s3-mcp:latest

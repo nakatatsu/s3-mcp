@@ -2,12 +2,13 @@ FROM python:3.12-slim AS base
 
 FROM base AS uv-installer
 RUN apt-get update && apt-get install -y curl && \
-    curl -LsSf https://astral.sh/uv/install.sh | sh && \
+    curl -L https://github.com/astral-sh/uv/releases/latest/download/uv-x86_64-unknown-linux-gnu.tar.gz | tar xz && \
+    install uv /usr/local/bin/uv && \
     apt-get purge -y curl && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 FROM base AS builder
 WORKDIR /app
-COPY --from=uv-installer /root/.cargo/bin/uv /usr/local/bin/uv
+COPY --from=uv-installer /usr/local/bin/uv /usr/local/bin/uv
 COPY pyproject.toml uv.lock ./
 RUN uv install --system --no-cache-dir
 

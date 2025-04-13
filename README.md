@@ -44,10 +44,6 @@ Add this to your Cursor MCP configuration:
 
 > If you prefer pinning to a specific Docker image build (e.g., 20250413-165732), use that tag instead of `latest`. Browse available versions on [Docker Hub](https://hub.docker.com/r/ashgw/s3-mcp/tags).
 
-Once added, you can use prompts like:
-
-> "Read the secret at path `apps/myapp/config` from Vault."
-
 Cursor will route that request through the MCP server automatically.
 
 ---

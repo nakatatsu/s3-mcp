@@ -1,6 +1,6 @@
+import boto3
 import os
 from typing import Any
-import boto3
 from fastmcp import FastMCP, Context
 
 
@@ -11,7 +11,7 @@ s3_client = boto3.client(
     region_name=os.getenv('AWS_REGION', 'us-west-1')
 )
 
-app = FastMCP("s3")
+app: FastMCP = FastMCP("s3")
 
 @app.tool(name="list_buckets", description="List all buckets")
 async def list_buckets(context: Context) -> Any:

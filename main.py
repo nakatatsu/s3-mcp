@@ -160,7 +160,7 @@ async def get_object(
     """
     try:
         response = s3_client.get_object(Bucket=bucket_name, Key=key)
-        return response["Body"].read()
+        return response["Body"].read().decode('utf-8')
     except Exception as e:
         return {"error": str(e)}
 

@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y curl && \
 
 WORKDIR /app
 COPY pyproject.toml uv.lock ./
-RUN uv install --system --no-cache-dir
+RUN uv sync
 
 COPY . .
 

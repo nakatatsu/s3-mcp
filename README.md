@@ -1,7 +1,3 @@
-# FastMCP S3 Server
-
-A FastMCP server implementation that provides a secure interface for interacting with AWS S3. This server allows clients to perform various S3 operations through a structured API.
-
 ## Overview
 
 This server enables you to:

@@ -62,12 +62,12 @@ async def create_bucket(
         }
     """
     try:
-        args = {
-            "Bucket": bucket_name,
-            "CreateBucketConfiguration": {"LocationConstraint": region},
-        }
-
-        s3_client.create_bucket(**args)
+        s3_client.create_bucket(
+            Bucket=bucket_name,
+            CreateBucketConfiguration={
+                'LocationConstraint': region if region != "us-east-1" else None  # type: ignore
+            }
+        )
 
         if config:
             if config.get("blockPublicAccess"):

@@ -1,4 +1,4 @@
-import boto3 
+import boto3
 from typing import Any, Dict, Optional, List, Union
 from fastmcp import FastMCP, Context
 from env import env
@@ -65,8 +65,8 @@ async def create_bucket(
         s3_client.create_bucket(
             Bucket=bucket_name,
             CreateBucketConfiguration={
-                'LocationConstraint': region if region != "us-east-1" else None  # type: ignore
-            }
+                "LocationConstraint": region if region != "us-east-1" else None  # type: ignore
+            },
         )
 
         if config:
@@ -135,10 +135,9 @@ async def list_bucket(
                         "last_modified": obj["LastModified"].isoformat(),
                     }
                 )
-        return {"bucket": bucket_name, "files": files}  
+        return {"bucket": bucket_name, "files": files}
     except Exception as e:
         return {"error": str(e)}
-
 
 
 @app.tool(name="get_object", description="Get an object from a bucket")
@@ -160,7 +159,7 @@ async def get_object(
     """
     try:
         response = s3_client.get_object(Bucket=bucket_name, Key=key)
-        return response["Body"].read().decode('utf-8')
+        return response["Body"].read().decode("utf-8")
     except Exception as e:
         return {"error": str(e)}
 
@@ -368,7 +367,9 @@ async def get_bucket_policy(
 
 
 @app.tool(name="delete_bucket_policy", description="Delete the current bucket policy")
-async def delete_bucket_policy(context: Context, bucket_name: str) -> Dict[str, Union[bool, str]]:
+async def delete_bucket_policy(
+    context: Context, bucket_name: str
+) -> Dict[str, Union[bool, str]]:
     """
     Delete the current policy for a specified S3 bucket.
 

@@ -1,4 +1,4 @@
-import boto3  # type: ignore
+import boto3 
 from typing import Any, Dict, Optional, List, Union
 from fastmcp import FastMCP, Context
 from env import env
@@ -103,7 +103,7 @@ async def create_bucket(
 @app.tool(name="list_bucket", description="List objects in a bucket")
 async def list_bucket(
     context: Context, bucket_name: str, key_prefix: str = ""
-) -> Dict[str, Union[str, List[Dict[str, Union[str, int]]]]]:
+) -> Dict[str, Union[str, List[Dict[str, Any]]]]:
     """
     List objects in a specified S3 bucket.
 

@@ -114,5 +114,58 @@ async def delete_object(context: Context, bucket_name: str, key: str):
     except Exception as e:
         return {"error": str(e)}
 
+
+@app.tool(name="generate_presigned_url", description="Generate a presigned URL for accessing or uploading an object")
+async def generate_presigned_url(context: Context, bucket_name: str, key: str, expires_in: int = 3600, http_method: str = "GET"):
+    """
+    Generates a presigned URL to GET or PUT an object.
+    """
+    try:
+        url = s3_client.generate_presigned_url(
+            ClientMethod='get_object' if http_method.upper() == "GET" else 'put_object',
+            Params={'Bucket': bucket_name, 'Key': key},
+            ExpiresIn=expires_in
+        )
+        return {"success": True, "url": url}
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.tool(name="put_bucket_policy", description="Set or update a bucket policy")
+async def put_bucket_policy(context: Context, bucket_name: str, policy_json: str):
+    """
+    Sets a bucket policy. policy_json should be a valid JSON string with the policy.
+    """
+    try:
+        s3_client.put_bucket_policy(
+            Bucket=bucket_name,
+            Policy=policy_json
+        )
+        return {"success": True}
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.tool(name="get_bucket_policy", description="Retrieve the current bucket policy")
+async def get_bucket_policy(context: Context, bucket_name: str):
+    """
+    Gets the bucket policy. Returns the policy text if it exists.
+    """
+    try:
+        response = s3_client.get_bucket_policy(Bucket=bucket_name)
+        return {"success": True, "policy": response["Policy"]}
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.tool(name="delete_bucket_policy", description="Delete the current bucket policy")
+async def delete_bucket_policy(context: Context, bucket_name: str):
+    """
+    Deletes the bucket policy if it exists.
+    """
+    try:
+        s3_client.delete_bucket_policy(Bucket=bucket_name)
+        return {"success": True}
+    except Exception as e:
+        return {"error": str(e)}
+
+        
 if __name__ == "__main__":
     app.run(transport='stdio')

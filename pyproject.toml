@@ -11,6 +11,10 @@ dependencies = [
     "fastmcp>=2.1.0",
 ]
 
+[tool.setuptools]
+py-modules = ["main", "env"]
+
+
 [dependency-groups]
 dev = [
     "mypy>=1.15.0",

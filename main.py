@@ -1,14 +1,13 @@
 import boto3
-import os
 from typing import Any
 from fastmcp import FastMCP, Context
-
+from env import env
 
 s3_client = boto3.client(
     's3',
-    aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
-    aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
-    region_name=os.getenv('AWS_REGION', 'us-west-1')
+    aws_access_key_id=env.AWS_ACCESS_KEY_ID,
+    aws_secret_access_key=env.AWS_SECRET_ACCESS_KEY,
+    region_name=env.AWS_REGION
 )
 
 app: FastMCP = FastMCP("s3")
@@ -30,10 +29,8 @@ async def create_bucket(context: Context, bucket_name: str, region: str = "us-we
             "CreateBucketConfiguration": {"LocationConstraint": region}
         }
 
-        # basic creation
         s3_client.create_bucket(**args)
 
-        # optionally apply extra config
         if config:
             if config.get("blockPublicAccess"):
                 s3_client.put_public_access_block(
@@ -60,7 +57,6 @@ async def create_bucket(context: Context, bucket_name: str, region: str = "us-we
     except Exception as e:
         return {"error": str(e)}
 
-# Existing tools below...
 
 @app.tool(name="list_bucket", description="List objects in a bucket")
 async def list_bucket(context: Context, bucket_name: str, key_prefix: str = ""):

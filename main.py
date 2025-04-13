@@ -1,5 +1,5 @@
-import boto3
-from typing import Any
+import boto3  # type: ignore
+from typing import Any, Dict, Optional, List, Union
 from fastmcp import FastMCP, Context
 from env import env
 
@@ -14,12 +14,12 @@ app: FastMCP = FastMCP("s3")
 
 
 @app.tool(name="list_buckets", description="List all buckets")
-async def list_buckets(context: Context) -> Any:
+async def list_buckets(context: Context) -> Dict[str, Union[List[str], str]]:
     """
     List all S3 buckets.
 
     Returns:
-        A dictionary containing a list of bucket names.
+        A dictionary containing a list of bucket names or an error message.
 
     Example:
         {
@@ -39,15 +39,18 @@ async def list_buckets(context: Context) -> Any:
     description="Create a new S3 bucket with optional security config",
 )
 async def create_bucket(
-    context: Context, bucket_name: str, region: str = "us-west-1", config: dict = None
-) -> Any:
+    context: Context,
+    bucket_name: str,
+    region: str = "us-west-1",
+    config: Optional[Dict[str, Any]] = None
+) -> Dict[str, Union[bool, str]]:
     """
     Create a new S3 bucket.
 
     Args:
         bucket_name (str): The name of the bucket to create.
         region (str): The AWS region where the bucket will be created. Default is "us-west-1".
-        config (dict): Optional configuration for the bucket (e.g., blockPublicAccess, versioning, encryption).
+        config (Optional[Dict[str, Any]]): Optional configuration for the bucket (e.g., blockPublicAccess, versioning, encryption).
 
     Returns:
         A dictionary indicating success or error.
@@ -98,7 +101,7 @@ async def create_bucket(
 
 
 @app.tool(name="list_bucket", description="List objects in a bucket")
-async def list_bucket(context: Context, bucket_name: str, key_prefix: str = "") -> Any:
+async def list_bucket(context: Context, bucket_name: str, key_prefix: str = "") -> Dict[str, Union[str, List[Dict[str, Union[str, int]]]]:
     """
     List objects in a specified S3 bucket.
 
@@ -107,7 +110,7 @@ async def list_bucket(context: Context, bucket_name: str, key_prefix: str = "") 
         key_prefix (str): Optional prefix to filter the objects.
 
     Returns:
-        A dictionary containing the bucket name and a list of files.
+        A dictionary containing the bucket name and a list of files or an error message.
 
     Example:
         {
@@ -136,7 +139,7 @@ async def list_bucket(context: Context, bucket_name: str, key_prefix: str = "") 
 
 
 @app.tool(name="get_object", description="Get an object from a bucket")
-async def get_object(context: Context, bucket_name: str, key: str) -> Any:
+async def get_object(context: Context, bucket_name: str, key: str) -> Union[str, Dict[str, str]]:
     """
     Retrieve an object from a specified S3 bucket.
 
@@ -145,7 +148,7 @@ async def get_object(context: Context, bucket_name: str, key: str) -> Any:
         key (str): The key of the object to retrieve.
 
     Returns:
-        The content of the object.
+        The content of the object or an error message.
 
     Example:
         "This is the content of the object."
@@ -158,7 +161,7 @@ async def get_object(context: Context, bucket_name: str, key: str) -> Any:
 
 
 @app.tool(name="put_object", description="Put an object into a bucket")
-async def put_object(context: Context, bucket_name: str, key: str, body: str) -> Any:
+async def put_object(context: Context, bucket_name: str, key: str, body: str) -> Dict[str, bool]:
     """
     Upload an object to a specified S3 bucket.
 
@@ -185,7 +188,7 @@ async def put_object(context: Context, bucket_name: str, key: str, body: str) ->
 @app.tool(name="upload_local_file", description="Upload a local file to a bucket")
 async def upload_local_file(
     context: Context, bucket_name: str, local_path: str, key: str
-) -> Any:
+) -> Dict[str, bool]:
     """
     Upload a local file to a specified S3 bucket.
 
@@ -215,7 +218,7 @@ async def upload_local_file(
 )
 async def download_file_to_local(
     context: Context, bucket_name: str, key: str, local_path: str
-) -> Any:
+) -> Dict[str, bool]:
     """
     Download a file from a specified S3 bucket to a local path.
 
@@ -240,7 +243,7 @@ async def download_file_to_local(
 
 
 @app.tool(name="delete_object", description="Delete an object from a bucket")
-async def delete_object(context: Context, bucket_name: str, key: str) -> Any:
+async def delete_object(context: Context, bucket_name: str, key: str) -> Dict[str, bool]:
     """
     Delete an object from a specified S3 bucket.
 
@@ -273,7 +276,7 @@ async def generate_presigned_url(
     key: str,
     expires_in: int = 3600,
     http_method: str = "GET",
-) -> Any:
+) -> Dict[str, Union[bool, str]]:
     """
     Generate a presigned URL for accessing or uploading an object.
 
@@ -284,7 +287,7 @@ async def generate_presigned_url(
         http_method (str): The HTTP method to use ("GET" or "PUT"). Default is "GET".
 
     Returns:
-        A dictionary containing the presigned URL.
+        A dictionary containing the presigned URL or an error message.
 
     Example:
         {
@@ -304,7 +307,7 @@ async def generate_presigned_url(
 
 
 @app.tool(name="put_bucket_policy", description="Set or update a bucket policy")
-async def put_bucket_policy(context: Context, bucket_name: str, policy_json: str) -> Any:
+async def put_bucket_policy(context: Context, bucket_name: str, policy_json: str) -> Dict[str, bool]:
     """
     Set or update the policy for a specified S3 bucket.
 
@@ -328,7 +331,7 @@ async def put_bucket_policy(context: Context, bucket_name: str, policy_json: str
 
 
 @app.tool(name="get_bucket_policy", description="Retrieve the current bucket policy")
-async def get_bucket_policy(context: Context, bucket_name: str) -> Any:
+async def get_bucket_policy(context: Context, bucket_name: str) -> Dict[str, Union[bool, str]]:
     """
     Retrieve the current policy for a specified S3 bucket.
 
@@ -336,7 +339,7 @@ async def get_bucket_policy(context: Context, bucket_name: str) -> Any:
         bucket_name (str): The name of the bucket.
 
     Returns:
-        A dictionary containing the bucket policy.
+        A dictionary containing the bucket policy or an error message.
 
     Example:
         {
@@ -352,7 +355,7 @@ async def get_bucket_policy(context: Context, bucket_name: str) -> Any:
 
 
 @app.tool(name="delete_bucket_policy", description="Delete the current bucket policy")
-async def delete_bucket_policy(context: Context, bucket_name: str) -> Any:
+async def delete_bucket_policy(context: Context, bucket_name: str) -> Dict[str, bool]:
     """
     Delete the current policy for a specified S3 bucket.
 

@@ -1,7 +1,7 @@
 [project]
-name = "s3-mcp"
+name = "claude-log-mcp"
 version = "0.1.0"
-description = "Add your description here"
+description = "Simple MCP server for storing logs to S3 with timestamp-based partitioning"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

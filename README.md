@@ -1,162 +1,129 @@
+# Claude Log MCP
+
+A simple MCP (Model Context Protocol) server for storing logs to Amazon S3 with automatic timestamp-based partitioning.
+
 ## Overview
 
-This server enables you to:
+Claude Log MCP is designed to provide AI assistants with a simple way to store structured logs in S3. It automatically organizes logs by timestamp and compresses them for efficient storage.
 
-- Manage S3 buckets and objects
-- Handle lifecycle configurations
-- Set and retrieve object tags
-- Manage bucket policies
-- Configure CORS settings
+## Features
 
-## Installation
+- Automatic timestamp-based S3 path generation (year/month/day/hour partitioning)
+- GZIP compression for all log entries
+- JSONL format for structured logging
+- Simple single-tool interface
 
-There are multiple ways to use this server depending on your setup.
+## S3 Path Structure
 
-### Cursor (recommended)
+Logs are stored with the following path structure:
 
-Add this to your Cursor MCP configuration:
+```
+s3://<bucket>/<prefix>/year=<YYYY>/month=<MM>/day=<DD>/hour=<HH>/<timestamp>_<title>.jsonl.gz
+```
+
+Example:
+```
+s3://my-logs/logs/year=2024/month=01/day=15/hour=14/20240115T143022Z_error_report.jsonl.gz
+```
+
+## Prerequisites
+
+- AWS Account with S3 access
+- AWS credentials with permissions to write to S3
+- Docker (for containerized deployment)
+
+## Environment Variables
+
+- `AWS_ACCESS_KEY_ID`: Your AWS access key
+- `AWS_SECRET_ACCESS_KEY`: Your AWS secret key
+- `AWS_REGION`: AWS region (defaults to us-west-1)
+- `AWS_S3_BUCKET`: Target S3 bucket name
+- `AWS_S3_PREFIX`: Prefix for log paths (defaults to "logs")
+
+## Usage
+
+### With Cursor
+
+Add to your Cursor configuration:
 
 ```json
 {
   "mcpServers": {
-    "s3-mcp": {
+    "claude-log-mcp": {
       "command": "docker",
       "args": [
         "run",
         "-i",
         "--rm",
         "-e",
-        "AWS_SECRET_ACCESS_KEY=your_access_key",
-        "-e",
         "AWS_ACCESS_KEY_ID=your_access_key",
         "-e",
+        "AWS_SECRET_ACCESS_KEY=your_secret_key",
+        "-e",
         "AWS_REGION=your_region",
-        "nakatatsu/s3-mcp:latest"
+        "-e",
+        "AWS_S3_BUCKET=your_bucket",
+        "-e",
+        "AWS_S3_PREFIX=logs",
+        "nakatatsu/claude-log-mcp:latest"
       ]
     }
   }
 }
 ```
 
-> If you prefer pinning to a specific Docker image build (e.g., 20250413-165732), use that tag instead of `latest`. Browse available versions on [Docker Hub](https://hub.docker.com/r/nakatatsu/s3-mcp/tags).
-
-Cursor will route that request through the MCP server automatically.
-
-Make sure it's green and all the tools are available.
-
-![image](https://github.com/user-attachments/assets/6b37044d-e6f3-447a-8809-4431822c0731)
-
----
-
-### Docker (manual)
-
-You can run the S3 MCP server manually via Docker:
+### Standalone Docker
 
 ```bash
 docker run --rm -it \
   -e AWS_ACCESS_KEY_ID=your_access_key \
   -e AWS_SECRET_ACCESS_KEY=your_secret_key \
   -e AWS_REGION=your_region \
-  nakatatsu/s3-mcp
+  -e AWS_S3_BUCKET=your_bucket \
+  -e AWS_S3_PREFIX=logs \
+  nakatatsu/claude-log-mcp
 ```
 
-This uses the pre-built image published at [nakatatsu/s3-mcp](https://hub.docker.com/repository/docker/nakatatsu/s3-mcp).
+### Building from Source
 
----
-
-### Repo
-
-Clone the repository and `cd` into it, then build with:
+Clone the repository and build:
 
 ```bash
-docker build -t s3-mcp .
+docker build -t claude-log-mcp .
 ```
 
-Then run with:
+## API
 
-```bash
-docker run --rm -e AWS_ACCESS_KEY_ID=your_access_key -e AWS_SECRET_ACCESS_KEY=your_secret_key -e AWS_REGION=your_region s3-mcp
+The MCP server exposes a single tool:
+
+### `put`
+
+Write a log entry to S3 with automatic timestamp-based path generation.
+
+**Parameters:**
+- `title` (string): Title for the log entry (used in filename)
+- `content` (string): Content to be logged
+
+**Returns:**
+```json
+{
+  "success": true,
+  "key": "logs/year=2024/month=01/day=15/hour=14/20240115T143022Z_error_report.jsonl.gz"
+}
 ```
 
-### Environment Variables
+## Log Format
 
-Set the following environment variables for AWS credentials:
+Each log file contains GZIP-compressed JSONL (JSON Lines) with the following structure:
 
-```bash
-export AWS_ACCESS_KEY_ID=your_access_key
-export AWS_SECRET_ACCESS_KEY=your_secret_key
-export AWS_REGION=your_region
-```
-
-## Features
-
-- **List Buckets**: Retrieve a list of all S3 buckets.
-- **Create Bucket**: Create a new S3 bucket with optional configurations.
-- **List Objects**: List all objects in a specified bucket.
-- **Get Object**: Retrieve the content of a specified object.
-- **Put Object**: Upload an object to a specified bucket.
-- **Delete Object**: Remove an object from a specified bucket.
-- **Generate Presigned URL**: Create a presigned URL for accessing or uploading an object.
-- **Set Bucket Policy**: Update or set a policy for a specified bucket.
-- **Get Bucket Policy**: Retrieve the current policy for a specified bucket.
-- **Delete Bucket Policy**: Remove the current policy for a specified bucket.
-- **Lifecycle Configuration**: Manage lifecycle rules for S3 buckets.
-- **Object Tagging**: Set and retrieve tags for S3 objects.
-- **CORS Configuration**: Get and set CORS rules for a bucket.
-- **Copy Object**: Copy an object from one location to another within S3.
-- **Download File to Local**: Download a file from a specified S3 bucket to a local path.
-- **Upload Local File**: Upload a local file to a specified S3 bucket.
-
-## Few Usage Examples
-
-### List Buckets
-
-```python
-response = await tool("list_buckets")
-print(response)
-```
-
-### Create a Bucket
-
-```python
-response = await tool("create_bucket", {
-    "bucket_name": "my-new-bucket",
-    "region": "us-west-1",
-    "config": {
-        "blockPublicAccess": {
-            "BlockPublicAcls": True,
-            "IgnorePublicAcls": True,
-            "BlockPublicPolicy": True,
-            "RestrictPublicBuckets": True
-        },
-        "versioning": True,
-        "encryption": "AES256"
-    }
-})
-print(response)
-```
-
-### Upload a File
-
-```python
-response = await tool("upload_local_file", {
-    "bucket_name": "my-new-bucket",
-    "local_path": "/path/to/local/file.txt",
-    "key": "file.txt"
-})
-print(response)
-```
-
-### Get Object Tags
-
-```python
-response = await tool("get_object_tagging", {
-    "bucket_name": "my-new-bucket",
-    "key": "file.txt"
-})
-print(response)
+```json
+{
+  "timestamp": "2024-01-15T14:30:22Z",
+  "title": "Error Report",
+  "content": "Detailed error information..."
+}
 ```
 
 ## License
 
-[MIT](/LICENSE)
+MIT

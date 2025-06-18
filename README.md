@@ -31,14 +31,14 @@ Add this to your Cursor MCP configuration:
         "AWS_ACCESS_KEY_ID=your_access_key",
         "-e",
         "AWS_REGION=your_region",
-        "ashgw/s3-mcp:latest"
+        "nakatatsu/s3-mcp:latest"
       ]
     }
   }
 }
 ```
 
-> If you prefer pinning to a specific Docker image build (e.g., 20250413-165732), use that tag instead of `latest`. Browse available versions on [Docker Hub](https://hub.docker.com/r/ashgw/s3-mcp/tags).
+> If you prefer pinning to a specific Docker image build (e.g., 20250413-165732), use that tag instead of `latest`. Browse available versions on [Docker Hub](https://hub.docker.com/r/nakatatsu/s3-mcp/tags).
 
 Cursor will route that request through the MCP server automatically.
 
@@ -57,10 +57,10 @@ docker run --rm -it \
   -e AWS_ACCESS_KEY_ID=your_access_key \
   -e AWS_SECRET_ACCESS_KEY=your_secret_key \
   -e AWS_REGION=your_region \
-  ashgw/s3-mcp
+  nakatatsu/s3-mcp
 ```
 
-This uses the pre-built image published at [ashgw/s3-mcp](https://hub.docker.com/repository/docker/ashgw/s3-mcp).
+This uses the pre-built image published at [nakatatsu/s3-mcp](https://hub.docker.com/repository/docker/nakatatsu/s3-mcp).
 
 ---
 

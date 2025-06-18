@@ -16,7 +16,7 @@ permissions:
   contents: write
 
 env:
-  DOCKERHUB_USERNAME: ashgw
+  DOCKERHUB_USERNAME: nakatatsu
 
 jobs:
   lint:

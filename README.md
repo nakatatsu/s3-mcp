@@ -42,36 +42,6 @@ s3://my-logs/logs/year=2024/month=01/day=15/hour=14/20240115T143022Z_error_repor
 
 ## Usage
 
-### With Cursor
-
-Add to your Cursor configuration:
-
-```json
-{
-  "mcpServers": {
-    "claude-log-mcp": {
-      "command": "docker",
-      "args": [
-        "run",
-        "-i",
-        "--rm",
-        "-e",
-        "AWS_ACCESS_KEY_ID=your_access_key",
-        "-e",
-        "AWS_SECRET_ACCESS_KEY=your_secret_key",
-        "-e",
-        "AWS_REGION=your_region",
-        "-e",
-        "AWS_S3_BUCKET=your_bucket",
-        "-e",
-        "AWS_S3_PREFIX=logs",
-        "nakatatsu/claude-log-mcp:latest"
-      ]
-    }
-  }
-}
-```
-
 ### Standalone Docker
 
 ```bash
